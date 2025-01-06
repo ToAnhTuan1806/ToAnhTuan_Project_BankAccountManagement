@@ -12,4 +12,3 @@ void searchUsersById(struct User users[], int length);
 void lockUnlockUsers(struct User users[], int length);
 void saveUsersToFile(struct User users[], int length);
 void loadUsersFromFile(struct User users[], int *length);
-void usersLogin(struct User users[], int length);

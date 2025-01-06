@@ -40,8 +40,7 @@ int main(int argc, char *argv[]) {
                         case 2:
                         	system("cls");
                         	printf("*** Show All users ***\n");
-                            showUsersData(users, currentLength);
-                            
+                            showUsersData(users, currentLength);     
                             break;
                         case 3:
                         	system("cls");

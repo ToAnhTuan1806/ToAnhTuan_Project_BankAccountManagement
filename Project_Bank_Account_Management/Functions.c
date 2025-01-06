@@ -61,7 +61,7 @@ void addUsers(struct User users[], int *length) {
                     }
                 }
             }
-            fflush(stdin); 
+            fflush(stdin);
         } while (check==0);
 
         do {
@@ -69,14 +69,7 @@ void addUsers(struct User users[], int *length) {
             printf("Enter the name: ");
             fgets(users[*length].name, sizeof(users[*length].name), stdin);
             users[*length].name[strcspn(users[*length].name, "\n")] = '\0';  
-            valid=0;
-            for(i=0; users[*length].name[i]!='\0'; i++){
-            	if(users[*length].name[i]!= ' '){
-            		valid=1;
-            		break;
-				}
-			}
-            if(valid==0) {
+            if(strlen(users[*length].name)==0 || strchr(users[*length].name, ' ') != NULL) {
                 printf("Name can't be empty. Try again!\n");
                 check=0;
             } 
@@ -104,15 +97,8 @@ void addUsers(struct User users[], int *length) {
             printf("Enter the email: ");
             fgets(users[*length].email, sizeof(users[*length].email), stdin);
             users[*length].email[strcspn(users[*length].email, "\n")] = '\0';
-			
-			valid=0;
-			for(i=0; users[*length].email[i]!='\0'; i++){
-            	if(users[*length].email[i]!= ' '){
-            		valid=1;
-            		break;
-				}
-			}
-            if(strlen(users[*length].email)==0 || valid==0) {
+
+            if(strlen(users[*length].email)==0 || strchr(users[*length].email, ' ') != NULL) {
                 printf("Email can't be empty. Try again!\n");
                 check = 0;
             } else if(users[*length].email[0]=='@'){
@@ -138,7 +124,11 @@ void addUsers(struct User users[], int *length) {
                 getchar();
                 check=0;
             } else {
-                if(strlen(users[*length].phone)!=10) {
+            	if(strlen(users[*length].phone)>10){
+            		printf("Phone number must not exceed 10 characters. Try again!\n");
+            		getchar();
+            		check=0;
+				} else if(strlen(users[*length].phone)!=10) {
                     printf("Phone must be exactly 10 characters. Try again!\n");
                     getchar();  
                     check=0;
@@ -168,6 +158,11 @@ void addUsers(struct User users[], int *length) {
 			
 			if (users[*length].dateOfBirth.month < 1 || users[*length].dateOfBirth.month > 12) {
 		        printf("Invalid month. Try again!\n");
+		        check = 0;
+		        continue;
+		    }
+		    if (users[*length].dateOfBirth.year < 1900 || users[*length].dateOfBirth.year > 2100) {
+		        printf("Invalid year. Year must be between 1900 and 2100. Try again!\n");
 		        check = 0;
 		        continue;
 		    }
@@ -219,15 +214,7 @@ void addUsers(struct User users[], int *length) {
             printf("Enter the Username: ");
             fgets(users[*length].userName, sizeof(users[*length].userName), stdin);
             users[*length].userName[strcspn(users[*length].userName, "\n")] = '\0';  
-            
-            valid=0;
-            for(i=0; users[*length].userName[i]!='\0'; i++){
-            	if(users[*length].userName[i]!= ' ' ){
-            		valid=1;
-            		break;
-				}
-			}
-            if(strlen(users[*length].userName)==0 || valid==0) {
+            if(strlen(users[*length].userName)==0 || strchr(users[*length].userName, ' ') != NULL) {
                 printf("User name can't be empty. Try again!\n");
                 check=0;
             } else {
@@ -316,37 +303,60 @@ void showDigitalUsersData(struct User users[], int length) {
 void softUsersByName(struct User users[], int length) {
 	printf("\n***Sort Order***\n");
     printf("====================\n");
-    printf("[1] Ascending.\n");
-    printf("[2] Descending.\n");
+    printf("[1] Ascending(A-Z, a-z).\n");
+    printf("[2] Descending(Z-A, z-a).\n");
     printf("[0] Exit Sorting.\n");
     printf("====================\n");
 	int choice;
 	int check=0;
+	struct User tempUsers[length];
 	while(check==0){
 		printf("Enter the choice: ");
 		scanf("%d", &choice);
 		getchar();
 		
-		if(choice==1 || choice==2) {
-			int i, j;
-			for(i=0; i<length-1; i++){
-				for(j=i+1; j<length; j++){
-					int select=strcmp(users[i].name, users[j].name);
-					if((choice==1&&select>0) || (choice==2&&select<0)) {
-						temp=users[i];
-						users[i]=users[j];
-						users[j]=temp;
+		int i, j;
+		if(choice==1 || choice==2){
+			for(i=0; i<length; i++){
+				tempUsers[i]=users[i];
+			}
+			
+		}
+		switch(choice){
+			case 1:
+				for(i=0; i<length-1; i++){
+					for(j=0; j<length-i-1; j++){
+						if(strcmp(tempUsers[j].name, tempUsers[j+1].name)>0){
+							temp=tempUsers[j];
+							tempUsers[j]=tempUsers[j+1];
+							tempUsers[j+1]=temp;
+						}
 					}
 				}
-			}
-			printf("\nSoft successfully.\n");
-			showUsersData(users, length);
-			check=1;
-		} else if(choice==0) {
-			printf("\nExit sort menu\n");
-			check=1;
-		} else {
-			printf("Invalid choice. Try again.\n");
+				printf("\nSorted in ascending order successfully.\n");
+				showUsersData(tempUsers, length);
+				check=1;
+                break;
+            case 2:
+				for(i=0; i<length-1; i++){
+					for(j=0; j<length-i-1; j++){
+						if(strcmp(tempUsers[j].name, tempUsers[j+1].name)<0){
+							temp=tempUsers[j];
+							tempUsers[j]=tempUsers[j+1];
+							tempUsers[j+1]=temp;
+						}
+					}
+				}
+				printf("\nSorted in descending order successfully.\n");
+				showUsersData(tempUsers, length);
+				check=1;
+                break; 
+			case 0:
+				printf("\nExit sort menu.\n");
+				check=1;
+				break;
+				default:
+					printf("Invalid choice. Try again.\n");	  
 		}
 	}
 } 
@@ -410,7 +420,7 @@ void searchUsersById(struct User users[], int length) {
 		}
 	}
 	if(found==0){
-		printf("\nNo user found with the ID \"%s\".\n", searchId);
+		printf("\nNo user found with the ID \"%s\"\n", searchId);
 	}
 	char choice;
         printf("\nGo back (b)? or Exit (0)?: ");
